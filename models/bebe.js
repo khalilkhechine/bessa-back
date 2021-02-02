@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const bebeSchema = mongoose.Schema({
   name: {type: String, required: true},
-  birthDay: {type: Date, required: true},
+  birthday: {type: Date, required: true},
   gender: {type: String, required: true},
   weight: {type: String},
   photo: {type: String},

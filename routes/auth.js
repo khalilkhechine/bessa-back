@@ -27,17 +27,17 @@ router.post('/login', (req, res) => {
             accessToken
           });
         } else {
-          res.json({
+          res.status(401).json({
             code: 'Unauthorized',
             message: 'Email or password incorrect'
-          }).status(401);
+          });
         }
       });
     }  else {
-      res.json({
+      res.status(401).json({
         code: 'Unauthorized',
         message: 'Unauthorized'
-      }).status(401);
+      });
     }
   });
 });
