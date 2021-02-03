@@ -7,7 +7,9 @@ const cors = require('cors')
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
-const bebeRouter = require('./routes/bebe');/*
+const bebeRouter = require('./routes/bebe');
+const babyBottleRouter = require('./routes/baby-bottle');
+/*
 const biberonRouter = require('./routes/auth');
 const coucheRouter = require('./routes/auth');
 const medecinRouter = require('./routes/auth');
@@ -42,5 +44,6 @@ db.once('open', function callback() {
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/bebes', bebeRouter);
+app.use('/api/baby-bottle', babyBottleRouter);
 
 module.exports = app;
