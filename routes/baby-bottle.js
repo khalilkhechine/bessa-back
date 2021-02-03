@@ -7,10 +7,13 @@ router.post('/', authenticateJWT, (req, res, next) => {
   const {role} = req.user;
 
   if (role === 'PARENT') {
+    const period = req.body.period ? req.body.period : 4;
+    const nextDate = new Date(req.body.createdAt);
+    nextDate.setHours( nextDate.getHours() + period )
     new BabyBottle({
       createdAt: req.body.createdAt,
-      period: req.body.period ? req.body.period : 4,
-      tokenBabyBottle: req.body.tokenBabyBottle,
+      period: period,
+      tokenBabyBottle: [{tokenDate: nextDate}],
       baby: req.body.baby
     }).save()
     .then(result => {
