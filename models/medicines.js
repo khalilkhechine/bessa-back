@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const medicamentSchema = mongoose.Schema({
-  nom: {type: String},
-  datePriseM: {type: Date},
-  nbreDePriseParJour: {type: String},
+  name: {type: String},
+  tokenDateMedicines: {type: Date},
+  timesNumberPerDay: {type: String},
   selectedBebe: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 
 });

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const teteSchema = mongoose.Schema({
-  heureTete: {type: Date},
+  teteHour: {type: Date},
   selectedBebe: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 
 });
