@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const tailleSchema = mongoose.Schema({
-  taille: {type: String},
+  height: {type: String},
   selectedBebe: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 
 });

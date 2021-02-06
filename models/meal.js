@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const repasSchema = mongoose.Schema({
-  datePriseR: {type: Date, required: true},
-  nom: {type: String},
+  tokenMeal: {type: Date, required: true},
+  name: {type: String},
   selectedBebe: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 
 });
