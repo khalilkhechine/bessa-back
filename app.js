@@ -10,6 +10,7 @@ const usersRouter = require('./routes/users');
 const bebeRouter = require('./routes/bebe');
 const babyBottleRouter = require('./routes/baby-bottle');
 const diaperRouter = require('./routes/diaper')
+const vaccineRouter = require('./routes/vaccine')
 /*
 const biberonRouter = require('./routes/auth');
 const coucheRouter = require('./routes/auth');
@@ -47,5 +48,6 @@ app.use('/api/users', usersRouter);
 app.use('/api/bebes', bebeRouter);
 app.use('/api/baby-bottle', babyBottleRouter);
 app.use('/api/diaper', diaperRouter);
+app.use('/api/vaccine', vaccineRouter);
 
 module.exports = app;

@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const vaccinSchema = mongoose.Schema({
+const vaccineSchema = mongoose.Schema({
   name: {type: String},
-  tokenDateVaccine: {type: Date},
+  createdAt: {type: Date},
+  vaccineDates: [{vaccineDate: Date}],
   period: {type: String},
   description: {type: String},
-  selectedBebe: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
-
+  baby: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 });
-module.exports = mongoose.model('Vaccin', vaccinSchema);
+module.exports = mongoose.model('Vaccine', vaccineSchema);
