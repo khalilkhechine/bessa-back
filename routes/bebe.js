@@ -75,7 +75,6 @@ router.get('/', authenticateJWT, (req, res, next) => {
   }
 });
 
-
 router.get('/:id', authenticateJWT, (req, res, next) => {
   const {role, id} = req.user;
   if (role === 'PARENT' || role === 'ADMIN') {
