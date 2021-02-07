@@ -9,21 +9,10 @@ const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const bebeRouter = require('./routes/bebe');
 const babyBottleRouter = require('./routes/baby-bottle');
-const diaperRouter = require('./routes/diaper')
-const vaccineRouter = require('./routes/vaccine')
-const growthRouter = require('./routes/growth')
-/*
-const biberonRouter = require('./routes/auth');
-const coucheRouter = require('./routes/auth');
-const medecinRouter = require('./routes/auth');
-const medicamentRouter = require('./routes/auth');
-const poidsRouter = require('./routes/auth');
-const repasouter = require('./routes/auth');
-const sommeilRouter = require('./routes/auth');
-const tailleRouter = require('./routes/auth');
-const temperatureRouter = require('./routes/auth');
-const teteRouter = require('./routes/auth');
-const vaccinRouter = require('./routes/auth');*/
+const diaperRouter = require('./routes/diaper');
+const vaccineRouter = require('./routes/vaccine');
+const growthRouter = require('./routes/growth');
+const temperatureRouter = require('./routes/temperature');
 
 const app = express();
 app.use(cors())
@@ -51,5 +40,6 @@ app.use('/api/baby-bottle', babyBottleRouter);
 app.use('/api/diaper', diaperRouter);
 app.use('/api/vaccine', vaccineRouter);
 app.use('/api/growth', growthRouter);
+app.use('/api/temperature', temperatureRouter);
 
 module.exports = app;
