@@ -11,7 +11,7 @@ router.post('/', authenticateJWT, (req, res, next) => {
             name: req.body.name,
             email: req.body.email,
             address: req.body.address,
-            specialty: req.body.specialty,
+            speciality: req.body.speciality,
             appointments: [],
             baby: req.body.baby
         }).save()
@@ -48,7 +48,7 @@ router.get('/baby/:id', authenticateJWT, (req, res, next) => {
 });
 
 
-router.put('/:id/appointment', authenticateJWT, (req, res, next) => {
+router.post('/:id/appointment', authenticateJWT, (req, res, next) => {
     const { role, id} = req.user;
     if (role === 'PARENT') {
         Doctor.findOne({_id: req.params.id}, (err, result) => {

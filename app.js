@@ -14,6 +14,7 @@ const vaccineRouter = require('./routes/vaccine');
 const growthRouter = require('./routes/growth');
 const temperatureRouter = require('./routes/temperature');
 const medicineRouter = require('./routes/medicine');
+const doctorRouter = require('./routes/doctor');
 
 const app = express();
 app.use(cors())
@@ -43,5 +44,6 @@ app.use('/api/vaccine', vaccineRouter);
 app.use('/api/growth', growthRouter);
 app.use('/api/temperature', temperatureRouter);
 app.use('/api/medicine', medicineRouter);
+app.use('/api/doctor', doctorRouter);
 
 module.exports = app;

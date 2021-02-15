@@ -73,4 +73,30 @@ router.get('/baby/:id', authenticateJWT, (req, res, next) => {
 });
 
 
+router.get('/baby/:id/stat/height', authenticateJWT, (req, res, next) => {
+    const {role, id} = req.user;
+    if (role === 'PARENT') {
+        Growth.findOne({baby: req.params.id}, (err, growth) => {
+            if (err) {
+                res.status(400).json({
+                    message: 'Bad request'
+                });
+            } else {
+                let statHeight = [];
+                if (growth && growth.growthing) {
+                    statHeight = growth.growthing
+                    .sort((a, b) => -(b.date - a.date))
+                }
+                res.status(200).json(statHeight);
+            }
+        });
+    } else {
+        res.status(401).json({
+            code: 'Unauthorized',
+            message: 'Unauthorized'
+        });
+    }
+});
+
+
 module.exports = router;
