@@ -1,9 +1,13 @@
+const accessTokenSecret = require('./utils/utils');
+
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require("mongoose");
-const cors = require('cors')
+const cors = require('cors');
+const CronJob = require('cron').CronJob;
+const jwt = require('jsonwebtoken');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
@@ -15,9 +19,18 @@ const growthRouter = require('./routes/growth');
 const temperatureRouter = require('./routes/temperature');
 const medicineRouter = require('./routes/medicine');
 const doctorRouter = require('./routes/doctor');
+const notifications  = require('./models/notification');
 
 const app = express();
-app.use(cors())
+
+const server = require('http').Server(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"]
+  }
+});
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -46,4 +59,17 @@ app.use('/api/temperature', temperatureRouter);
 app.use('/api/medicine', medicineRouter);
 app.use('/api/doctor', doctorRouter);
 
-module.exports = app;
+
+io.on('connection', function (socket) {
+  console.log(socket.handshake.auth.user);
+
+  console.log('Before job instantiation');
+  const job = new CronJob('* * * * *', () => {
+    notifications.findNewNotification(io, socket.handshake.auth.user.id);
+  });
+  console.log('After job instantiation');
+  job.start();
+
+});
+
+module.exports = {app: app, server: server};
