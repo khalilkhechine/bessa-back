@@ -60,16 +60,19 @@ app.use('/api/medicine', medicineRouter);
 app.use('/api/doctor', doctorRouter);
 
 
-io.on('connection', function (socket) {
-  console.log(socket.handshake.auth.user);
-
-  console.log('Before job instantiation');
+io.on('connection',  (socket) => {
+  notifications.findOldNotification(io, socket.handshake.auth.user.id)
   const job = new CronJob('* * * * *', () => {
     notifications.findNewNotification(io, socket.handshake.auth.user.id);
   });
-  console.log('After job instantiation');
-  job.start();
-
+  if (!job.running) {
+    job.start();
+  }
+  socket.on('readNotifications', (data) => {
+    notifications.setRead(data);
+  });
 });
+
+
 
 module.exports = {app: app, server: server};

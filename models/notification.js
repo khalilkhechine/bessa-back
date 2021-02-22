@@ -8,6 +8,7 @@ const Baby = require('../models/bebe');
 const NotificationSchema = mongoose.Schema({
   type: {type: String, required: true},
   date: {type: Date, required: true},
+  referenceId: {type: mongoose.Schema.Types.ObjectId},
   read: {type: Boolean},
   baby: {type: mongoose.Schema.Types.ObjectId, ref: 'Bebe'}
 });
@@ -15,7 +16,6 @@ const NotificationSchema = mongoose.Schema({
 const Notification = mongoose.model('Notifications', NotificationSchema);
 
 const findNewNotification = (io, id) => {
-
   Baby.find({parent: id}, (err, result ) => {
     findBabyBottleNotification(io, result);
     findDiaperNotification(io, result);
@@ -24,93 +24,105 @@ const findNewNotification = (io, id) => {
   });
 }
 
+const findOldNotification = (io, id) => {
+  Baby.find({parent: id}, (err, babies ) => {
+    const ids = babies.map(b => b._id);
+    Notification.find({baby: ids, read: false, date: {$gte: new Date()}}, (err, result) => {
+      if (err) {
+      }
+      result.forEach(n => {
+        io.sockets.emit('notification', n);
+      })
+    });
+  });
+}
+
 const findBabyBottleNotification = (io, babies) => {
   const ids = babies.map(b => b._id);
-  console.log(ids);
-  const currentDate = new Date();
-  currentDate.setHours(currentDate.getHours() + 1);
+  const maxDate = new Date();
+  maxDate.setHours(maxDate.getHours() + 1);
   BabyBottle.find({baby: ids}, (err, result) => {
     if (err) {}
     result.forEach(babyBottle => {
       babyBottle.tokenBabyBottle
-        .filter(tokenDate => tokenDate.tokenDate <= currentDate)
+        .filter(tokenDate => tokenDate.tokenDate <= maxDate)
         .forEach(tokenDate => {
-          new Notification({
-            type: 'babyBottle',
-            date: tokenDate.tokenDate,
-            read: false,
-            baby: babyBottle.baby
-          }).save().then((result) => {
-            io.sockets.emit('notification', result);
-          });
-          console.log('find new notification', new Date());
+          saveAndSendNotification(tokenDate._id, io, 'babyBottle', tokenDate.tokenDate, babyBottle.baby)
         });
     });
   });
 }
 
 const findDiaperNotification = (io, babies) => {
+  const maxDate = new Date();
   const currentDate = new Date();
-  currentDate.setHours(currentDate.getHours() + 3);
-  Diaper.find({}, (err, result) => {
+  const ids = babies.map(b => b._id);
+  maxDate.setHours(maxDate.getHours() + 3);
+  Diaper.find({baby: ids}, (err, result) => {
     if (err) {}
     result.forEach(diaper => {
       diaper.usedDiaper
-      .filter(ud => ud.usedDate <= currentDate)
+      .filter(ud => ud.usedDate <= maxDate && ud.usedDate > currentDate)
       .forEach(ud => {
-        new Notification({
-          type: 'diaper',
-          date: ud.usedDate,
-          read: false,
-          baby: diaper.baby
-        }).save();
-        console.log('find   notification', new Date());
+        saveAndSendNotification(ud._id, io, 'diaper', ud.usedDate, diaper.baby)
       });
     });
   });
 }
 
 const findDoctorNotification = (io, babies) => {
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() + 3);
-  Doctor.find({}, (err, result) => {
+  const ids = babies.map(b => b._id);
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 7);
+  Doctor.find({baby: ids}, (err, result) => {
     if (err) {}
     result.forEach(doctor => {
       doctor.appointments
-      .filter(ud => ud.appointment <= currentDate)
+      .filter(ud => ud.appointment <= maxDate)
       .forEach(ud => {
-        new Notification({
-          type: 'doctor',
-          date: ud.appointment,
-          read: false,
-          baby: doctor.baby
-        }).save();
-        console.log('find   notification', new Date());
+        saveAndSendNotification(ud._id, io, 'doctor', ud.appointment, doctor.baby)
       });
     });
   });
 }
 
 const findVaccineNotification = (io, babies) => {
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() + 3);
-  Vaccine.find({}, (err, result) => {
+  const ids = babies.map(b => b._id);
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 3);
+  Vaccine.find({baby: ids}, (err, result) => {
     if (err) {}
     result.forEach(vaccine => {
       vaccine.vaccineDates
-      .filter(ud => ud.vaccineDate <= currentDate)
+      .filter(ud => ud.vaccineDate <= maxDate)
       .forEach(ud => {
-        new Notification({
-          type: 'vaccine',
-          date: ud.vaccineDate,
-          read: false,
-          baby: vaccine.baby
-        }).save();
-        console.log('find   notification', new Date());
+        saveAndSendNotification(ud._id, io, 'vaccine', ud.vaccineDate, vaccine.baby)
       });
     });
   });
 }
 
-module.exports = {findNewNotification, Notification};
+const saveAndSendNotification = (referenceId, io, type, date, babyId) => {
+  Notification.countDocuments({referenceId: referenceId},  (err, count) => {
+    if(count === 0) {
+      console.log('new notification' + type +  ' : ' + new Date());
+      new Notification({
+        type: type,
+        date: date,
+        read: false,
+        referenceId: referenceId,
+        baby: babyId
+      }).save().then((result) => {
+        io.sockets.emit('notification', result);
+      });
+    }
+  });
+}
+
+const setRead = (notifications) => {
+  const ids = notifications.map(e => e._id);
+  Notification.updateMany({_id: ids}, {$set: {read: true}}).exec()
+}
+
+module.exports = {findNewNotification, findOldNotification, setRead, Notification};
 
